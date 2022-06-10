@@ -5,8 +5,33 @@
 //  Created by Udrea Alexandru-Iulian-Alberto on 08.06.2022.
 //
 
+struct Login: View {
+    @State var username=""
+    @State var password=""
+
+    var body: some View {
+        NavigationView{
+            Form{
+                Section(header: Text("Profile"))
+                {
+                    TextField("Username:" , text: $username)
+                    SecureField("Password:" , text: $password)
+
+                }
+                Section {
+                                   Button(action: {
+                                       print("username: \(username)  password:\(password)")
+                                   }) {
+                                       Text("Submit")
+                                   }
+                               }
+        }.navigationTitle("Login to your account")
+    }
+}
+}
+
 import SwiftUI
-struct SecondView: View {
+struct Register: View {
     @State var username=""
     @State var password=""
 
@@ -50,8 +75,15 @@ struct ContentView: View {
                 Divider().background(Color.white)
                 Text("Do you need to lose some fat or improve your fitness? This app comes in your help! Create an account and start your journey!")
                 Divider().background(Color.white)
-                NavigationLink(destination: SecondView()) {
+                NavigationLink(destination: Register()) {
                 Text("Register now!")
+                        .padding()
+                        .background(Color(red: 0, green: 0, blue: 0.5))
+                        .foregroundColor(.white)
+                        .clipShape(Capsule())
+                }
+                NavigationLink(destination: Login()) {
+                Text("Login")
                         .padding()
                         .background(Color(red: 0, green: 0, blue: 0.5))
                         .foregroundColor(.white)
