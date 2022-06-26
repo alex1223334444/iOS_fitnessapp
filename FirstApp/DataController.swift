@@ -9,7 +9,8 @@ import Foundation
 
 class DataController: ObservableObject {
     let container = NSPersistentContainer(name: "DataModel")
-    
+    static let shared = DataController()
+
     init() {
         container.loadPersistentStores { description, error in
             if let error = error {

@@ -7,15 +7,25 @@
 
 
 import SwiftUI
+import CoreData
 
+struct MainPage : View {
+    var body: some View {
+        Text("Account main page")
+        .navigationBarBackButtonHidden(true)
+
+    }
+}
 
 
 struct Login: View {
     @State var username=""
     @State var password=""
+    @FetchRequest(sortDescriptors: []) var users: FetchedResults<User>
+    @State private var userFound = false
 
     var body: some View {
-
+        
             NavigationView{
             Form{
                 
@@ -26,13 +36,30 @@ struct Login: View {
 
                 }
                 Section {
+                    var count=0
                                    Button(action: {
+                                       for user in users {
+                                           if(user.username==username && user.password==password)
+                                           {
+                                               count=1
+                                               print("found user \(user.username)  and password  \(user.password)")
+                                               userFound=true
+                                           }
+                                           if(count==0)
+                                           {
+                                               print("user not found")
+                                           }
+                                                
+                                                
+                                       }
                                        print("username: \(username)  password:\(password)")
                                    }) {
-                                       Text("Submit")
-                                           .foregroundColor(.blue)
+//                                       Text("Submit")
+//                                           .foregroundColor(.blue)
+                                       NavigationLink("Submit", destination:  MainPage(), isActive: $userFound)
 
                                    }
+                                
                                }
         }.navigationTitle("Login to your account")
                     .foregroundColor(.red)
@@ -47,6 +74,8 @@ struct Login: View {
                       UITableView.appearance().backgroundColor = .systemGroupedBackground
                     }
     }
+            .navigationBarBackButtonHidden(true)
+
         }
         }
 
@@ -56,7 +85,7 @@ struct Register: View {
     @Environment(\.managedObjectContext) var moc
     @State var _username=""
     @State var _password=""
-
+    
     var body: some View {
         NavigationView{
             Form{
@@ -114,22 +143,33 @@ struct ContentView: View {
                 
                 Text("Count your macros!")
                     .font(.title)
+                    .foregroundColor(.black)
+                    .position(x: 150, y: 250)
+                    .font(.system(size: 35))
                 Divider().background(Color.white)
                 Text("Do you need to lose some fat or improve your fitness? This app comes in your help! Create an account and start your journey!")
+                    .foregroundColor(.black)
+                    .position(x: 150, y: 100)
+                    .font(.system(size: 23))
+                
+
                 Divider().background(Color.white)
                 NavigationLink(destination: Register()) {
                 Text("Register now!")
                         .padding()
-                        .background(Color(red: 0, green: 0, blue: 0.5))
-                        .foregroundColor(.white)
+                        .background(Color(red: 0.6, green: 0.4, blue: 0.2))
+                        .foregroundColor(.black)
                         .clipShape(Capsule())
+                        .font(.system(size: 25))
+
                 }
                 NavigationLink(destination: Login()) {
                 Text("Login")
                         .padding()
-                        .background(Color(red: 0, green: 0, blue: 0.5))
-                        .foregroundColor(.white)
+                        .background(Color(red: 0.6, green: 0.4, blue: 0.2))
+                        .foregroundColor(.black)
                         .clipShape(Capsule())
+                        .font(.system(size: 25))
                 }
             }
             .foregroundColor(.white)
@@ -147,12 +187,15 @@ struct ContentView: View {
             }
         }
 }
+}
 }*/
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
         Group {
             ContentView()
+                //.previewInterfaceOrientation(.portrait)
+                //.previewInterfaceOrientation(.landscapeRight)
         }
     }
 }
