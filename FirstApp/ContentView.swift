@@ -9,10 +9,130 @@
 import SwiftUI
 import CoreData
 
-struct MainPage : View {
+var usern = ""
+
+struct Settings : View {
+    @State  var currentWeight = 0
+    @State  var goalWeight = 0
+    @State  var selectedHeight = 0
+    @State  var selectedAge = 0
+    @State  var selectedGender :String=""
+    @State  var firstName :String=""
+    @State  var lastName :String=""
+    @State  var data=false
+    @State private var userFound = false
+
+    @FetchRequest(sortDescriptors: []) var users: FetchedResults<User>
+
     var body: some View {
-        Text("Account main page")
+        let heights = 100..<200
+        let ages = 1..<100
+        let genders=["male","female"]
+        Form {
+            Section(header: Text("Set your goals so I can personalize your calories intake:")){
+                
+                TextField("First name:" , text: $firstName)
+                    .padding()
+                TextField("Last name:" , text: $lastName)
+                    .padding()
+                Text("Set current weight")
+                TextField("Current weight", value: $currentWeight,format: .number)
+                    .textFieldStyle(.roundedBorder)
+                Text("Set goal weight")
+                TextField("Goal weight:" , value: $goalWeight,format: .number)
+                    .textFieldStyle(.roundedBorder)
+                
+                //Text("Set your height")
+                Menu("Height") {
+                Picker(selection: $selectedHeight,label: Text("Select your height"))
+                {
+                
+                    ForEach(heights, id: \.self) {
+                        Text(String($0))
+
+                                            }
+                                        }
+                    .pickerStyle(.menu)}
+                
+                //Text("Set your age")
+                Menu("Age"){
+                Picker(selection: $selectedAge,label: Text("Select age"))
+                {
+                
+                    ForEach(ages, id: \.self) {
+                        Text(String($0))
+
+                                            }
+                                        }
+                    .pickerStyle(.menu)}
+                
+                //Text("Set your gender")
+                Menu("Gender"){
+                Picker(selection: $selectedGender,label: Text("Select gender"))
+                {
+
+                    ForEach(genders, id: \.self) {
+                        Text(String($0))
+
+                                            }
+                                        }
+                    .pickerStyle(.menu)}
+                
+            
+        }
+        }.navigationBarBackButtonHidden(true)
+            .offset(y:-35)
+        Button("Save data",action: {
+            if(selectedHeight>0 && selectedAge>0 && !(selectedGender.isEmpty)  && !(firstName.isEmpty) && !(lastName.isEmpty) && currentWeight>0 && goalWeight>0){
+                data=true
+                for user in users {
+                    if(user.username==usern)
+                    {
+                        userFound=true
+                        user.currentWeight=Float(currentWeight)
+                        user.goalWeight=Float(goalWeight)
+                        user.firstName=firstName
+                        user.lastName=lastName
+                        user.height=Int16(selectedHeight)
+                        user.age=Int16(selectedAge)
+                        if(selectedGender=="male"){
+                            user.gender=true
+                        }
+                        else{
+                            user.gender=false
+                        }
+                        print(user)
+                    }
+                
+            }
+            print(data)
+
+            }})
+            
+            NavigationLink("",destination:  MainPage(), isActive: $data )
+
+        
+}
+}
+
+               
+
+struct MainPage : View {
+    
+    @State var food = ""
+    var body: some View {
+        
+        Form {
+        Text("Hello \(usern)")
+        Text("Log what you have eaten")
+        TextField("required", text: $food)
+        }
         .navigationBarBackButtonHidden(true)
+        .navigationTitle("Home")
+        
+        
+        
+
 
     }
 }
@@ -44,6 +164,7 @@ struct Login: View {
                                                count=1
                                                print("found user \(user.username)  and password  \(user.password)")
                                                userFound=true
+                                               usern=user.username!
                                            }
                                            if(count==0)
                                            {
@@ -56,7 +177,7 @@ struct Login: View {
                                    }) {
 //                                       Text("Submit")
 //                                           .foregroundColor(.blue)
-                                       NavigationLink("Submit", destination:  MainPage(), isActive: $userFound)
+                                       NavigationLink("Submit", destination:  MainPage(), isActive: $userFound )
 
                                    }
                                 
@@ -74,7 +195,6 @@ struct Login: View {
                       UITableView.appearance().backgroundColor = .systemGroupedBackground
                     }
     }
-            .navigationBarBackButtonHidden(true)
 
         }
         }
@@ -85,7 +205,7 @@ struct Register: View {
     @Environment(\.managedObjectContext) var moc
     @State var _username=""
     @State var _password=""
-    
+    @State private var userCreated = false
     var body: some View {
         NavigationView{
             Form{
@@ -102,12 +222,13 @@ struct Register: View {
                                        user.id = UUID()
                                        user.username = "\(_username)"
                                        user.password = "\(_password)"
+                                       userCreated=true
                                        try? moc.save()
 
 
                                    }) {
-                                       Text("Submit")
-                                           .foregroundColor(.blue)
+                                       
+                                        NavigationLink("Submit", destination:  Settings(), isActive: $userCreated )
                                    }
                                }
         }.navigationTitle("Create your account")
